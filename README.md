@@ -35,7 +35,9 @@ Type an expression, press **Enter**, and get the result instantly — no buttons
 ## Download
 
 Go to [Releases](../../releases) and download the latest `Calculator.exe`.  
-No installation required. No .NET runtime required (self-contained).
+
+**.NET 8 Runtime** is required.  
+[Download .NET 8 Runtime](https://dotnet.microsoft.com/download/dotnet/8.0)
 
 ---
 
