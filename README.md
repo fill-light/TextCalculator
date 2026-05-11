@@ -1,17 +1,17 @@
-# 🧮 Calculator
+# 🧮 TextCalculator
 
-A keyboard-driven expression calculator built with **C# .NET 8 WinForms**.  
+A keyboard-driven expression calculator built with **C# .NET Framework 4.8 WinForms**.  
 Type an expression, press **Enter**, and get the result instantly — no buttons needed.
 
 ![Platform](https://img.shields.io/badge/platform-Windows-blue)
-![.NET](https://img.shields.io/badge/.NET-8.0-purple)
+![.NET](https://img.shields.io/badge/.NET_Framework-4.8-purple)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 ---
 
 ## Screenshots
 
-![screenshot](docs/screenshot.png)
+> *(Add your screenshots here)*
 
 ---
 
@@ -28,16 +28,16 @@ Type an expression, press **Enter**, and get the result instantly — no buttons
 - ✅ Multi-line paste — evaluates line by line in order
 - ✅ Dark / Light / Monokai themes
 - ✅ Customizable UI font and editor font
-- ✅ Settings saved automatically (`%AppData%\Calculator\settings.json`)
+- ✅ Settings saved automatically (`%AppData%\Calculator\settings.ini`)
 
 ---
 
 ## Download
 
 Go to [Releases](../../releases) and download the latest `Calculator.exe`.  
+No installation required. No additional runtime required.
 
-**.NET 8 Runtime** is required.  
-[Download .NET 8 Runtime](https://dotnet.microsoft.com/download/dotnet/8.0)
+> Windows 10 / 11 includes **.NET Framework 4.8** built-in — just download and run.
 
 ---
 
@@ -97,20 +97,16 @@ fact 12            Prime factorization
 
 ## Build from Source
 
-**Requirements:** .NET 8 SDK, Windows
+**Requirements:** Visual Studio 2022, .NET Framework 4.8 SDK
 
 ```bash
-git clone https://github.com/fill-light/Calculator.git
-cd Calculator
-dotnet build -c Release
+git clone https://github.com/fill-light/TextCalculator.git
+cd TextCalculator
 ```
 
-**Publish as single EXE:**
+Open `Calculator.slnx` in Visual Studio and press **Ctrl+Shift+B** to build.
 
-```bash
-dotnet publish -c Release
-# Output: bin\Release\net8.0-windows\win-x64\publish\Calculator.exe
-```
+Output: `bin\Release\net48\Calculator.exe`
 
 ---
 
@@ -119,11 +115,11 @@ dotnet publish -c Release
 ```
 Calculator/
 ├── Program.cs            Entry point
-├── Calculator.csproj     Project file (.NET 8, WinForms)
+├── Calculator.csproj     Project file (.NET Framework 4.8)
 ├── CalculatorForm.cs     Main form — UI and calculation logic
 ├── ExpressionParser.cs   Recursive descent parser (real numbers)
 ├── ComplexParser.cs      Complex number expression parser
-├── AppSettings.cs        JSON settings save/load
+├── AppSettings.cs        INI settings save/load
 ├── FontPickerForm.cs     Font picker dialog
 ├── ThemePickerForm.cs    Theme picker dialog
 └── HelpForm.cs           Help window
