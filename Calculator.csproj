@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows7.0</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationIcon>Calculator.ico</ApplicationIcon>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <AssemblyName>Calculator</AssemblyName>
+    <RootNamespace>Calculator</RootNamespace>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+
+    <!-- 단일 EXE 설정 -->
+    <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PublishReadyToRun>true</PublishReadyToRun>    <!-- 시작 속도 개선 -->    
+    
+  </PropertyGroup>
+
+</Project>
