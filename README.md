@@ -11,7 +11,7 @@ Type an expression, press **Enter**, and get the result instantly — no buttons
 
 ## Screenshots
 
-> *(Add your screenshots here)*
+![screenshot](docs/screenshot.png)
 
 ---
 
