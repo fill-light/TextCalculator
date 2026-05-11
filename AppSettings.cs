@@ -1,87 +1,92 @@
 ﻿using System;
 using System.Drawing;
 using System.IO;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace Calculator
 {
     public class AppSettings
     {
-        // ── 저장할 값들 ───────────────────────────────────────
-        public string  Theme          { get; set; } = "Light";
+        public string Theme { get; set; } = "Light";
+        public string UIFontName { get; set; } = "Segoe UI";
+        public float UIFontSize { get; set; } = 9f;
+        public string EditorFontName { get; set; } = "Consolas";
+        public float EditorFontSize { get; set; } = 11f;
 
-        public string  UIFontName     { get; set; } = "Segoe UI";
-        public float   UIFontSize     { get; set; } = 9f;
-
-        public string  EditorFontName { get; set; } = "Consolas";
-        public float   EditorFontSize { get; set; } = 11f;
-
-        // ── 파일 경로 ─────────────────────────────────────────
         private static string SettingsPath =>
             Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                 "Calculator",
-                "settings.json");
+                "settings.ini");
 
-        private static readonly JsonSerializerOptions _jsonOpts = new()
-        {
-            WriteIndented        = true,
-            Converters           = { new JsonStringEnumConverter() }
-        };
-
-        // ── 불러오기 ──────────────────────────────────────────
         public static AppSettings Load()
         {
+            var s = new AppSettings();
             try
             {
-                string path = SettingsPath;
-                if (!File.Exists(path)) return new AppSettings();
-                string json = File.ReadAllText(path);
-                return JsonSerializer.Deserialize<AppSettings>(json, _jsonOpts)
-                       ?? new AppSettings();
+                if (!File.Exists(SettingsPath)) return s;
+                foreach (var line in File.ReadAllLines(SettingsPath))
+                {
+                    var parts = line.Split('=');
+                    if (parts.Length != 2) continue;
+                    string key = parts[0].Trim();
+                    string val = parts[1].Trim();
+                    switch (key)
+                    {
+                        case "Theme": s.Theme = val; break;
+                        case "UIFontName": s.UIFontName = val; break;
+                        case "UIFontSize":
+                            float.TryParse(val, out float us);
+                            s.UIFontSize = us > 0 ? us : 9f; break;
+                        case "EditorFontName": s.EditorFontName = val; break;
+                        case "EditorFontSize":
+                            float.TryParse(val, out float es);
+                            s.EditorFontSize = es > 0 ? es : 11f; break;
+                    }
+                }
             }
-            catch
-            {
-                return new AppSettings();
-            }
+            catch { }
+            return s;
         }
 
-        // ── 저장 ─────────────────────────────────────────────
         public void Save()
         {
             try
             {
-                string dir = Path.GetDirectoryName(SettingsPath)!;
+                string dir = Path.GetDirectoryName(SettingsPath);
                 if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
-                string json = JsonSerializer.Serialize(this, _jsonOpts);
-                File.WriteAllText(SettingsPath, json);
+                File.WriteAllLines(SettingsPath, new[]
+                {
+                    $"Theme={Theme}",
+                    $"UIFontName={UIFontName}",
+                    $"UIFontSize={UIFontSize}",
+                    $"EditorFontName={EditorFontName}",
+                    $"EditorFontSize={EditorFontSize}"
+                });
             }
-            catch { /* 저장 실패는 무시 */ }
+            catch { }
         }
 
-        // ── 헬퍼: Font ↔ Settings 변환 ───────────────────────
         public Font GetUIFont()
         {
-            try   { return new Font(UIFontName, UIFontSize); }
+            try { return new Font(UIFontName, UIFontSize); }
             catch { return new Font("Arial", 9f); }
         }
 
         public Font GetEditorFont()
         {
-            try   { return new Font(EditorFontName, EditorFontSize); }
+            try { return new Font(EditorFontName, EditorFontSize); }
             catch { return new Font("Courier New", 11f); }
         }
 
         public AppTheme GetTheme()
         {
-            return Enum.TryParse<AppTheme>(Theme, out var t) ? t : AppTheme.Light;
+            return Enum.TryParse(Theme, out AppTheme t) ? t : AppTheme.Light;
         }
 
         public void SetFont(Font uiFont, Font editorFont)
         {
-            UIFontName     = uiFont.Name;
-            UIFontSize     = uiFont.Size;
+            UIFontName = uiFont.Name;
+            UIFontSize = uiFont.Size;
             EditorFontName = editorFont.Name;
             EditorFontSize = editorFont.Size;
         }

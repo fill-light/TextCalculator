@@ -61,7 +61,7 @@ namespace Calculator
         // ══════════════════════════════════════════════════════
         //  Font helper
         // ══════════════════════════════════════════════════════
-        private static Font? TryFont(string name, float size)
+        private static Font TryFont(string name, float size)
         {
             try
             {

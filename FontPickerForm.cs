@@ -69,9 +69,9 @@ namespace Calculator
             var installed = new InstalledFontCollection();
             var allFamilies    = installed.Families.Select(f => f.Name).OrderBy(n => n).ToArray();
             var monoFamilies   = allFamilies
-                .Where(n => MonoFamilies.Any(m => n.Contains(m, StringComparison.OrdinalIgnoreCase))
-                         || n.Contains("mono", StringComparison.OrdinalIgnoreCase)
-                         || n.Contains("code",  StringComparison.OrdinalIgnoreCase))
+                .Where(n => MonoFamilies.Any(m => n.IndexOf(m, StringComparison.OrdinalIgnoreCase) >= 0 ) 
+                         || n.IndexOf("mono", StringComparison.OrdinalIgnoreCase) >= 0
+                         || n.IndexOf("code",  StringComparison.OrdinalIgnoreCase) >= 0)
                 .ToArray();
             // Fall back to all fonts if list is too short
             if (monoFamilies.Length < 3) monoFamilies = allFamilies;

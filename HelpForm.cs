@@ -6,7 +6,7 @@ namespace Calculator
 {
     public class HelpForm : Form
     {
-        public HelpForm(Font? uiFont = null)
+        public HelpForm(Font uiFont = null)
         {
             if (uiFont != null) this.Font = uiFont;
             this.Text = "Calculator Help !!!";
