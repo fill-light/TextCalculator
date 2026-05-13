@@ -125,8 +125,10 @@ Examples:
   a = 5 + 7i        -> Complex result: a = 5 + 7i
   fact 12           -> 2 * 2 * 3
 
-Revision by 
-ver 1.0 2026.05.11
+  Calculator v1.0
+  © 2025 fill-light
+  https://github.com/fill-light/TextCalculator
+  MIT License
 ";
         }
     }
