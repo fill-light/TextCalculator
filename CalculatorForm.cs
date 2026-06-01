@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Linq;
 
 namespace Calculator
 {
@@ -40,6 +42,21 @@ namespace Calculator
                                 ?? TryFont("Consolas", 11f)
                                 ?? new Font("Courier New", 11f);
 
+        private FlowLayoutPanel _chipPanel;
+
+        private static readonly string[] AllFunctions =
+        {
+            "sin(", "cos(", "tan(",
+            "asin(", "acos(", "atan(",
+            "sinh(", "cosh(", "tanh(",
+            "ln(", "log(", "exp(",
+            "pow(", "sqr(", "sqrn(",
+            "abs(", "int(", "rnd(",
+            "max(", "min(",
+            "re(", "im(", "norm(", "pol(",
+            "fact ", "pi", "e"
+        };
+
         public CalculatorForm()
         {
             //this.Icon = new Icon("Calculator.ico");
@@ -53,6 +70,7 @@ namespace Calculator
             SetThemeColors();
             InitializeComponent();
             ApplyThemeToControls();
+            UpdateChips("");
             variables["pi"] = Math.PI;
             variables["e"]  = Math.E;
             SetStatus("Ready  —  F1: Help   Enter: Calculate");
@@ -192,6 +210,28 @@ namespace Calculator
                 { grpAngle, sep1, grpBase, sep2, cbEcho,
                   btnFont, btnTheme, btnVar, btnHelp });
 
+            // ── 함수 칩 패널 ──────────────────────────────────
+            var chipPanel = new FlowLayoutPanel
+            {
+                Dock = DockStyle.Bottom,
+                Height = 72,
+                BackColor = clrTopPanel,
+                Padding = new Padding(4, 4, 4, 4),
+                AutoScroll = false,
+                WrapContents = true
+            };
+
+            chipPanel.Paint += (s, e) =>
+            {
+                using var pen = new Pen(clrAccent);
+                e.Graphics.DrawLine(pen, 0, 0, _chipPanel.Width, 0);
+                _chipPanel.BackColor = clrTopPanel;
+            };
+
+            _chipPanel = chipPanel;
+            this.Controls.Add(chipPanel);
+            chipPanel.BringToFront();
+
             // ── Editor ────────────────────────────────────────
             rtbMain = new RichTextBox
             {
@@ -252,6 +292,18 @@ namespace Calculator
                 btn.Invalidate();
             }
             topPanel.Invalidate();
+
+            _chipPanel.BackColor = clrTopPanel;
+            // 칩 버튼들 색상도 업데이트
+            foreach (Control c in _chipPanel.Controls)
+                if (c is Button btn)
+                {
+                    btn.BackColor = clrAccent;
+                    btn.ForeColor = Color.White;
+                }
+            _chipPanel.Invalidate();
+            UpdateChips("");
+
         }
 
         // ══════════════════════════════════════════════════════
@@ -361,6 +413,25 @@ namespace Calculator
                 e.Handled = e.SuppressKeyPress = true;
                 ProcessCurrentLine();
             }
+
+            rtbMain.KeyUp += RtbMain_KeyUp;
+        }
+
+        private void RtbMain_KeyUp(object sender, KeyEventArgs e)
+        {
+            // 계산 키는 무시
+            if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.F12) return;
+
+            int pos = rtbMain.SelectionStart;
+            string text = rtbMain.Text;
+
+            // 커서 앞 마지막 단어 추출
+            int i = pos - 1;
+            while (i >= 0 && (char.IsLetterOrDigit(text[i]) || text[i] == '_'))
+                i--;
+            string lastWord = text.Substring(i + 1, pos - i - 1);
+
+            UpdateChips(lastWord);
         }
 
         private void InsertLastResult()
@@ -420,6 +491,7 @@ namespace Calculator
             {
                 AppendLine($"Error: {ex.Message}");
                 SetStatus($"Error: {ex.Message}");
+                UpdateChips("");
             }
         }
 
@@ -504,6 +576,67 @@ namespace Calculator
             foreach (var kv in variables) sb.AppendLine($"  {kv.Key} = {kv.Value}");
             foreach (var kv in complexVars) sb.AppendLine($"  {kv.Key} = {FmtC(kv.Value)}");
             MessageBox.Show(sb.ToString(), "Variables", MessageBoxButtons.OK, MessageBoxIcon.None);
+        }
+
+        private void UpdateChips(string filter)
+        {
+            _chipPanel.SuspendLayout();
+            _chipPanel.Controls.Clear();
+
+            var filtered = string.IsNullOrEmpty(filter)
+                ? AllFunctions
+                : AllFunctions
+                    .Where(f => f.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0)
+                    .OrderBy(f => f.IndexOf(filter, StringComparison.OrdinalIgnoreCase))
+                    .ToArray();
+
+            foreach (var fn in filtered)
+            {
+                string display = fn.EndsWith("(") ? fn.Substring(0, fn.Length - 1) : fn.TrimEnd();
+                string insert = fn;
+
+                var btn = new Button
+                {
+                    Text = display,
+                    Height = 28,
+                    AutoSize = true,
+                    FlatStyle = FlatStyle.Flat,
+                    BackColor = clrAccent,
+                    ForeColor = Color.White,
+                    Font = new Font("Segoe UI", 8.5f),
+                    Margin = new Padding(3, 3, 3, 3),
+                    Cursor = Cursors.Hand,
+                    Tag = insert
+                };
+                btn.FlatAppearance.BorderSize = 0;
+                btn.Click += (s, e) =>
+                {
+                    InsertChip(insert);
+                    rtbMain.Focus();
+                };
+                _chipPanel.Controls.Add(btn);
+            }
+
+            _chipPanel.ResumeLayout();
+        }
+
+        private void InsertChip(string fn)
+        {
+            int pos = rtbMain.SelectionStart;
+            string text = rtbMain.Text;
+
+            // 커서 앞의 마지막 단어 찾기
+            int i = pos - 1;
+            while (i >= 0 && (char.IsLetterOrDigit(text[i]) || text[i] == '_'))
+                i--;
+            int wordStart = i + 1;
+            int wordLength = pos - wordStart;
+
+            // 단어 부분을 fn으로 교체
+            rtbMain.SelectionStart = wordStart;
+            rtbMain.SelectionLength = wordLength;
+            rtbMain.SelectedText = fn;
+            rtbMain.SelectionStart = wordStart + fn.Length;
         }
     }
 
