@@ -460,7 +460,7 @@ namespace Calculator
             if (string.IsNullOrWhiteSpace(line)) { AppendLine(""); return; }
 
             string lower = line.ToLower();
-            if (lower == "clr" || lower == "cls")  { rtbMain.Clear(); SetStatus("Cleared"); return; }
+            if (lower == "clr" || lower == "cls")  { rtbMain.Clear(); SetStatus("Cleared"); UpdateChips(""); return; }
 
             if (lower.StartsWith("precision "))
             {
