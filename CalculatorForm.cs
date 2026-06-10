@@ -43,6 +43,7 @@ namespace Calculator
                                 ?? new Font("Courier New", 11f);
 
         private FlowLayoutPanel _chipPanel;
+        private string _lastChipFilter = null;
 
         private static readonly string[] AllFunctions =
         {
@@ -414,23 +415,38 @@ namespace Calculator
                 ProcessCurrentLine();
             }
 
-            rtbMain.KeyUp += RtbMain_KeyUp;
+            // 변경 전
+            //rtbMain.KeyUp += RtbMain_KeyUp;
+
+            // 변경 후
+            rtbMain.TextChanged += RtbMain_TextChanged;
         }
 
-        private void RtbMain_KeyUp(object sender, KeyEventArgs e)
-        {
-            // 계산 키는 무시
-            if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.F12) return;
+        //private void RtbMain_KeyUp(object sender, KeyEventArgs e)
+        //{
+        //    // 계산 키는 무시
+        //    if (e.KeyCode == Keys.Enter || e.KeyCode == Keys.F12) return;
 
+        //    int pos = rtbMain.SelectionStart;
+        //    string text = rtbMain.Text;
+
+        //    // 커서 앞 마지막 단어 추출
+        //    int i = pos - 1;
+        //    while (i >= 0 && (char.IsLetterOrDigit(text[i]) || text[i] == '_'))
+        //        i--;
+        //    string lastWord = text.Substring(i + 1, pos - i - 1);
+
+        //    UpdateChips(lastWord);
+        //}
+
+        private void RtbMain_TextChanged(object sender, EventArgs e)
+        {
             int pos = rtbMain.SelectionStart;
             string text = rtbMain.Text;
-
-            // 커서 앞 마지막 단어 추출
             int i = pos - 1;
             while (i >= 0 && (char.IsLetterOrDigit(text[i]) || text[i] == '_'))
                 i--;
             string lastWord = text.Substring(i + 1, pos - i - 1);
-
             UpdateChips(lastWord);
         }
 
@@ -580,6 +596,10 @@ namespace Calculator
 
         private void UpdateChips(string filter)
         {
+            // 필터가 바뀌지 않았으면 스킵
+            if (filter == _lastChipFilter) return;
+            _lastChipFilter = filter;
+
             _chipPanel.SuspendLayout();
             _chipPanel.Controls.Clear();
 
